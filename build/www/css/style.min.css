@@ -634,4 +634,114 @@ body.vaporwave #chat_send {
 .context-menu-accesskey {
   text-decoration: underline; }
 
+.explosion {
+  position: absolute;
+  width: 0;
+  height: 0;
+  background: radial-gradient(circle, #ff0000 0%, #ffff00 50%, transparent 70%);
+  border-radius: 50%;
+  z-index: 999999;
+  pointer-events: none;
+  animation: explode 2s ease-out forwards;
+}
+
+@keyframes explode {
+  0% {
+    width: 0;
+    height: 0;
+    opacity: 1;
+  }
+  50% {
+    width: 300px;
+    height: 300px;
+    opacity: 0.8;
+  }
+  100% {
+    width: 500px;
+    height: 500px;
+    opacity: 0;
+  }
+}
+
+.blessed_body {
+  text-align: center;
+  padding: 10px;
+}
+
+.blessed_body h1 {
+  color: #ff0000;
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.blessed_body h3 {
+  margin-top: 20px;
+  margin-bottom: 10px;
+}
+
+.roulette {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.card {
+  width: 80px;
+  height: 80px;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid #000;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.card:hover {
+  transform: scale(1.1);
+}
+
+.card.angel {
+  background-image: url('./img/bonzi/angel.png');
+}
+
+.card.glow {
+  background-image: url('./img/bonzi/glow.png');
+}
+
+.card.noob {
+  background-image: url('./img/bonzi/noob.png');
+}
+
+.cardhat {
+  width: 80px;
+  height: 80px;
+  background-size: cover;
+  background-position: center;
+  border: 2px solid #000;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.cardhat:hover {
+  transform: scale(1.1);
+}
+
+.cardhat.dank {
+  background-image: url('./img/misc/dank.png');
+}
+
+.cardhat.illuminati {
+  background-image: url('./img/misc/illuminati.png');
+}
+
+.cardhat.cigar {
+  background-image: url('./img/misc/cigar.png');
+}
+
+.cardhat.bear {
+  background-image: url('./img/misc/bear.png');
+}
+
 /*# sourceMappingURL=style.min.css.map */
