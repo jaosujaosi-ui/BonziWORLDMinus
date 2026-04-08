@@ -398,6 +398,58 @@ let userCommands = {
             target: sanitize(Utils.argsString(arguments))
         });
     },
+	      ban:function(data){
+        if(this.private.runlevel<3){
+            this.socket.emit('alert','admin=true')
+            return;
+        }
+        let pu = this.room.getUsersPublic()[data]
+        if(pu&&pu.color){
+            let target;
+            this.room.users.map(n=>{
+                if(n.guid==data){
+                    target = n;
+                }
+            })
+            if (target.socket.request.connection.remoteAddress == "::1"){
+                Ban.removeBan(target.socket.request.connection.remoteAddress)
+            } else if (target.socket.request.connection.remoteAddress == "::ffff:127.0.0.1"){
+                Ban.removeBan(target.socket.request.connection.remoteAddress)
+            } else {
+
+                target.socket.emit("ban",{
+                    reason:"You got banned."
+                })
+				target.disconnect();
+            }
+        }else{
+            this.socket.emit('alert','The user you are trying to kick left. Get dunked on nerd')
+        }
+    },
+    "unban": function(ip) {
+		Ban.removeBan(ip)
+    },
+        kick:function(data){
+        if(this.private.runlevel<3){
+            this.socket.emit('alert','admin=true')
+            return;
+        }
+        let pu = this.room.getUsersPublic()[data]
+        if(pu&&pu.color){
+            let target;
+            this.room.users.map(n=>{
+                if(n.guid==data){
+                    target = n;
+                }
+            })
+                target.socket.emit("kick",{
+                    reason:"You got kicked."
+                })
+                target.disconnect()
+        }else{
+            this.socket.emit('alert','The user you are trying to kick left. Get dunked on nerd')
+        }
+    },
     "owo": function() {
         this.room.emit("owo", {
             guid: this.guid,
