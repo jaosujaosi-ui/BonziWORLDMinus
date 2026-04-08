@@ -153,110 +153,204 @@ window.onload = function(){
     })
 }
 
-// Add settings button
-$('#chat_send').before('<button id="settings_button">Settings</button><button id="video_button">Videos</button>');
-$('#content').append(`
-<div id="settings_dialog" style="display:none;">
-    <label>Volume: <input type="range" id="volume_slider" min="0" max="1" step="0.1" value="1"></label><br>
-    <label>Classic Background Color: <input type="color" id="bg_color" value="#421f60"></label><br>
-    <label>Blacklist: <input type="text" id="blacklist" placeholder="Comma separated banned words"></label><br>
-    <label>Custom CSS: <textarea id="custom_css" rows="10" cols="50" placeholder="Enter custom CSS here. Warning: This can brick BonziWORLD if you don't know what you're doing."></textarea></label>
-</div>
+// Add dialog styles
+$('head').append(`
+<style>
+    .simple-dialog-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.7);
+        display: none;
+        z-index: 9998;
+    }
+    .simple-dialog {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        background-color: #1a1a1a;
+        color: white;
+        border: 2px solid #421f60;
+        border-radius: 10px;
+        padding: 20px;
+        z-index: 9999;
+        max-height: 90vh;
+        overflow-y: auto;
+        display: none;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.9);
+    }
+    .simple-dialog-title {
+        font-size: 18px;
+        font-weight: bold;
+        margin-bottom: 15px;
+        color: #88ff00;
+    }
+    .simple-dialog-content {
+        margin-bottom: 15px;
+    }
+    .simple-dialog-content label {
+        display: block;
+        margin-bottom: 10px;
+    }
+    .simple-dialog-content input[type="text"],
+    .simple-dialog-content input[type="color"],
+    .simple-dialog-content textarea {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+        background-color: #2a2a2a;
+        border: 1px solid #421f60;
+        border-radius: 5px;
+        color: white;
+        box-sizing: border-box;
+    }
+    .simple-dialog-content input[type="range"] {
+        width: 100%;
+        margin-top: 5px;
+    }
+    .simple-dialog-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: flex-end;
+        margin-top: 15px;
+    }
+    .simple-dialog-buttons button {
+        background-color: #421f60;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+    .simple-dialog-buttons button:hover {
+        background-color: #5a2a80;
+    }
+    #video_player {
+        width: 100%;
+        max-width: 600px;
+        height: auto;
+        border: 2px solid #421f60;
+        border-radius: 10px;
+        margin-bottom: 10px;
+    }
+    #video_playlist {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        max-height: 400px;
+        overflow-y: auto;
+    }
+    .video_item {
+        background-color: #421f60;
+        color: white;
+        border: none;
+        padding: 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 14px;
+        text-align: left;
+    }
+    .video_item:hover {
+        background-color: #5a2a80;
+    }
+</style>
 `);
-$('#content').append(`
-<div id="video_dialog" style="display:none;">
-    <style>
-        #video_player {
-            width: 100%;
-            max-width: 640px;
-            height: auto;
-            border: 2px solid #421f60;
-            border-radius: 10px;
-            margin-bottom: 10px;
-        }
-        #video_playlist {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        .video_item {
-            background-color: #421f60;
-            color: white;
-            border: none;
-            padding: 10px;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            text-align: left;
-        }
-        .video_item:hover {
-            background-color: #5a2a80;
-        }
-    </style>
-    <video id="video_player" controls></video>
-    <div id="video_playlist">
-        <button class="video_item" data-src="./img/Videos/Bubble%20Bass.mp4">Bubble Bass</button>
-        <button class="video_item" data-src="./img/Videos/Jade%20No%20Skuteru%20Skir%20Skir%20Skir.mp4">Jade No Skuteru Skir Skir Skir</button>
-        <button class="video_item" data-src="./img/Videos/Luigi%20Oh%20No.mp4">Luigi Oh No</button>
-        <button class="video_item" data-src="./img/Videos/Weird-Al-Yankovic-Albuquerque.mp4">Weird-Al-Yankovic-Albuquerque</button>
-        <button class="video_item" data-src="./img/Videos/Yo%20Mama%20Joke.mp4">Yo Mama Joke</button>
-        <button class="video_item" data-src="./img/Videos/Ytp%20Sexer.mp4">Ytp Sexer</button>
+
+// Add dialog HTML
+$('body').append(`
+<div class="simple-dialog-overlay" id="dialog_overlay"></div>
+<div class="simple-dialog" id="settings_dialog" style="width: 600px;">
+    <div class="simple-dialog-title">Settings</div>
+    <div class="simple-dialog-content">
+        <label>Volume: <input type="range" id="volume_slider" min="0" max="1" step="0.1" value="1"></label>
+        <label>Classic Background Color: <input type="color" id="bg_color" value="#421f60"></label>
+        <label>Blacklist: <input type="text" id="blacklist" placeholder="Comma separated banned words"></label>
+        <label>Custom CSS: <textarea id="custom_css" rows="10" placeholder="Enter custom CSS here. Warning: This can brick BonziWORLD if you don't know what you're doing."></textarea></label>
+    </div>
+    <div class="simple-dialog-buttons">
+        <button class="dialog-cancel-btn">Cancel</button>
+        <button class="dialog-ok-btn">OK</button>
+    </div>
+</div>
+<div class="simple-dialog" id="video_dialog" style="width: 700px;">
+    <div class="simple-dialog-title">Video Player</div>
+    <div class="simple-dialog-content">
+        <video id="video_player" controls></video>
+        <div id="video_playlist">
+            <button class="video_item" data-src="./img/Videos/Bubble%20Bass.mp4">Bubble Bass</button>
+            <button class="video_item" data-src="./img/Videos/Jade%20No%20Skuteru%20Skir%20Skir%20Skir.mp4">Jade No Skuteru Skir Skir Skir</button>
+            <button class="video_item" data-src="./img/Videos/Luigi%20Oh%20No.mp4">Luigi Oh No</button>
+            <button class="video_item" data-src="./img/Videos/Weird-Al-Yankovic-Albuquerque.mp4">Weird-Al-Yankovic-Albuquerque</button>
+            <button class="video_item" data-src="./img/Videos/Yo%20Mama%20Joke.mp4">Yo Mama Joke</button>
+            <button class="video_item" data-src="./img/Videos/Ytp%20Sexer.mp4">Ytp Sexer</button>
+        </div>
+    </div>
+    <div class="simple-dialog-buttons">
+        <button class="dialog-close-btn">Close</button>
     </div>
 </div>
 `);
 
+// Add settings button
+$('#chat_send').before('<button id="settings_button">Settings</button><button id="video_button">Videos</button>');
+
+// Dialog helper functions
+function showDialog(dialogId) {
+    $('#dialog_overlay').show();
+    $('#' + dialogId).show();
+}
+
+function hideDialog(dialogId) {
+    $('#dialog_overlay').hide();
+    $('#' + dialogId).hide();
+}
+
+// Settings dialog
 $('#settings_button').click(function(){
-    $('#settings_dialog').dialog({
-        title: 'Settings',
-        modal: true,
-        width: 600,
-        buttons: {
-            OK: function(){
-                // Apply settings
-                let volume = $('#volume_slider').val();
-                localStorage.setItem('volume', volume);
-                // Assume volume is used somewhere, perhaps set a global
-                window.volume = volume;
-
-                let bgColor = $('#bg_color').val();
-                localStorage.setItem('bg_color', bgColor);
-                $('body').css('background-color', bgColor);
-
-                let blacklist = $('#blacklist').val();
-                localStorage.setItem('blacklist', blacklist);
-                // Perhaps send to server or use locally
-
-                let customCss = $('#custom_css').val();
-                localStorage.setItem('custom_css', customCss);
-                $('#theme').html(customCss);
-
-                $(this).dialog('close');
-            },
-            Cancel: function(){
-                $(this).dialog('close');
-            }
-        }
-    });
     // Load current values
     $('#volume_slider').val(localStorage.getItem('volume') || 1);
     $('#bg_color').val(localStorage.getItem('bg_color') || '#421f60');
     $('#blacklist').val(localStorage.getItem('blacklist') || '');
     $('#custom_css').val(localStorage.getItem('custom_css') || '');
+    showDialog('settings_dialog');
 });
 
+$('#settings_dialog .dialog-ok-btn').click(function(){
+    // Apply settings
+    let volume = $('#volume_slider').val();
+    localStorage.setItem('volume', volume);
+    window.volume = volume;
+
+    let bgColor = $('#bg_color').val();
+    localStorage.setItem('bg_color', bgColor);
+    $('body').css('background-color', bgColor);
+
+    let blacklist = $('#blacklist').val();
+    localStorage.setItem('blacklist', blacklist);
+
+    let customCss = $('#custom_css').val();
+    localStorage.setItem('custom_css', customCss);
+    $('#theme').html(customCss);
+
+    hideDialog('settings_dialog');
+});
+
+$('#settings_dialog .dialog-cancel-btn').click(function(){
+    hideDialog('settings_dialog');
+});
+
+// Video dialog
 $('#video_button').click(function(){
-    $('#video_dialog').dialog({
-        title: 'Video Player',
-        modal: true,
-        width: 700,
-        height: 600,
-        buttons: {
-            Close: function(){
-                $('#video_player')[0].pause();
-                $(this).dialog('close');
-            }
-        }
-    });
+    showDialog('video_dialog');
+});
+
+$('#video_dialog .dialog-close-btn').click(function(){
+    $('#video_player')[0].pause();
+    hideDialog('video_dialog');
 });
 
 $(document).on('click', '.video_item', function(){
@@ -264,6 +358,13 @@ $(document).on('click', '.video_item', function(){
     $('#video_player').attr('src', src);
     $('#video_player')[0].load();
     $('#video_player')[0].play();
+});
+
+// Close dialogs when clicking overlay
+$('#dialog_overlay').click(function(){
+    hideDialog('settings_dialog');
+    hideDialog('video_dialog');
+    $('#video_player')[0].pause();
 });
 
 // Apply saved settings on load
