@@ -130,13 +130,18 @@
     "cartoonnetwork",
     "brasilempire",
     "stella",
+    "yellow",
+    "cameraman",
+    "cartoonnetwork",
+    "brasilempire",
+    "stella",
     "peedy",
-        "grinnyboi",
-            "yan",
-    "yellow"
+    "grinnyboi", 
+    "yan",
+    "bustystickwoman"
   ],
   "banLength": 1440,
-  "port": 80,
+  "port": 3000,
   "express": {
     "serveStatic": true
   },
