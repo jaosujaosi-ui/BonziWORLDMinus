@@ -636,29 +636,22 @@ body.vaporwave #chat_send {
 
 .explosion {
   position: absolute;
-  width: 0;
-  height: 0;
-  background: radial-gradient(circle, #ff0000 0%, #ffff00 50%, transparent 70%);
-  border-radius: 50%;
+  width: 128px;
+  height: 128px;
+  background-image: url('./img/misc/explode.png');
+  background-size: 1024px 128px;
   z-index: 999999;
   pointer-events: none;
-  animation: explode 2s ease-out forwards;
+  animation: explode 0.8s steps(8) forwards;
 }
 
 @keyframes explode {
   0% {
-    width: 0;
-    height: 0;
+    background-position: 0 0;
     opacity: 1;
   }
-  50% {
-    width: 300px;
-    height: 300px;
-    opacity: 0.8;
-  }
   100% {
-    width: 500px;
-    height: 500px;
+    background-position: -1024px 0;
     opacity: 0;
   }
 }
