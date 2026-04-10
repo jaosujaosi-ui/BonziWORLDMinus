@@ -197,6 +197,7 @@ class Room {
         this.rid = rid;
         this.prefs = prefs;
         this.users = [];
+        this.polls = {};
     }
 
     deconstruct() {
@@ -395,6 +396,37 @@ let userCommands = {
 	    "bless": function() {
         this.public.color = "blessed";
         this.room.updateUser(this);
+    },
+    "poll": function() {
+        if (this.public.color !== "blessed") {
+            return this.socket.emit('commandFail', { reason: 'blessed' });
+        }
+
+        var body = Utils.argsString(arguments);
+        var parts = body.split("||").map(function (part) {
+            return part.trim();
+        }).filter(Boolean);
+
+        if (parts.length < 2) return;
+
+        var pollId = parts[0];
+        var question = parts[1];
+        var options = parts.slice(2);
+        if (options.length === 0) options = ["Yes", "No"];
+
+        this.room.polls[pollId] = {
+            id: pollId,
+            title: question,
+            options: options,
+            voters: {}
+        };
+
+        this.room.emit('poll', {
+            guid: this.guid,
+            id: pollId,
+            title: question,
+            options: options
+        });
     },
     "asshole": function() {
         this.room.emit("asshole", {
@@ -670,6 +702,7 @@ class User {
 
         this.socket.on('talk', this.talk.bind(this));
         this.socket.on('command', this.command.bind(this));
+        this.socket.on('vote', this.vote.bind(this));
         this.socket.on('disconnect', this.disconnect.bind(this));
     }
 
@@ -703,6 +736,34 @@ class User {
           });
       }
   }
+
+    vote(data) {
+        if (typeof data != 'object') return;
+        if (typeof data.poll == 'undefined' || typeof data.vote == 'undefined') return;
+
+        var poll = this.room.polls[data.poll];
+        if (!poll) return;
+        if (poll.options.indexOf(data.vote) === -1) return;
+
+        poll.voters = poll.voters || {};
+        poll.voters[this.guid] = data.vote;
+
+        var counts = {};
+        poll.options.forEach(function (option) {
+            counts[option] = 0;
+        });
+        Object.keys(poll.voters).forEach(function (guid) {
+            var vote = poll.voters[guid];
+            if (typeof counts[vote] !== 'undefined') counts[vote]++;
+        });
+
+        this.room.emit('vote', {
+            poll: data.poll,
+            guid: this.guid,
+            vote: data.vote,
+            counts: counts
+        });
+    }
 
     command(data) {
         if (typeof data != 'object') return; // Crash fix (issue #9)
