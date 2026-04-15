@@ -293,6 +293,15 @@ $('body').append(`
         <button class="dialog-close-btn">Close</button>
     </div>
 </div>
+<div class="simple-dialog" id="notepad_dialog" style="width: 500px;">
+    <div class="simple-dialog-title">Notepad</div>
+    <div class="simple-dialog-content">
+        <textarea id="notepad_text" rows="20" cols="50" placeholder="Type your notes here..."></textarea>
+    </div>
+    <div class="simple-dialog-buttons">
+        <button class="dialog-close-btn">Close</button>
+    </div>
+</div>
 `);
 
 // Add settings button
@@ -353,6 +362,12 @@ $('#video_dialog .dialog-close-btn').click(function(){
     hideDialog('video_dialog');
 });
 
+$('#notepad_dialog .dialog-close-btn').click(function(){
+    // Save notepad content
+    localStorage.setItem('notepad', $('#notepad_text').val());
+    hideDialog('notepad_dialog');
+});
+
 $(document).on('click', '.video_item', function(){
     let src = $(this).data('src');
     $('#video_player').attr('src', src);
@@ -360,10 +375,47 @@ $(document).on('click', '.video_item', function(){
     $('#video_player')[0].play();
 });
 
+// Start menu
+$('#start_button').click(function(){
+    $('#start_menu').toggle();
+});
+
+$('#menu_notepad').click(function(){
+    // Load saved notes
+    $('#notepad_text').val(localStorage.getItem('notepad') || '');
+    showDialog('notepad_dialog');
+    $('#start_menu').hide();
+});
+
+$('#menu_settings').click(function(){
+    // Load current values
+    $('#volume_slider').val(localStorage.getItem('volume') || 1);
+    $('#bg_color').val(localStorage.getItem('bg_color') || '#421f60');
+    $('#blacklist').val(localStorage.getItem('blacklist') || '');
+    $('#custom_css').val(localStorage.getItem('custom_css') || '');
+    showDialog('settings_dialog');
+    $('#start_menu').hide();
+});
+
+$('#menu_videos').click(function(){
+    showDialog('video_dialog');
+    $('#start_menu').hide();
+});
+
+// Close start menu when clicking elsewhere
+$(document).click(function(e){
+    if(!$(e.target).closest('#start_button').length && !$(e.target).closest('#start_menu').length){
+        $('#start_menu').hide();
+    }
+});
+
 // Close dialogs when clicking overlay
 $('#dialog_overlay').click(function(){
+    // Save notepad content
+    localStorage.setItem('notepad', $('#notepad_text').val());
     hideDialog('settings_dialog');
     hideDialog('video_dialog');
+    hideDialog('notepad_dialog');
     $('#video_player')[0].pause();
 });
 
