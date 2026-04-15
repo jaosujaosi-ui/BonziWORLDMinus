@@ -49,12 +49,19 @@
 
 		
 		<table id="chat_bar"><tr>
+			<td id="start_button">settings</td>
 			<td id="chat_send">send</td>
 			<td id="chat_message_cont"><input id="chat_message" type="text" placeholder="Enter a message"></td>
 			<td id="chat_tray">
 				<div id="btn_tile" class="tray_btn"></div>
 			</td>
 		</tr></table>
+
+		<div id="start_menu" style="display:none; position:absolute; bottom:30px; left:0; width:200px; height:150px; background-image:url('./img/desktop/start_menu.png'); background-size:100% 100%; z-index:1000; border:1px solid #000;">
+			<div id="menu_notepad" style="position:absolute; top:20px; left:10px; cursor:pointer; color:white; font-weight:bold;"><img src="./img/desktop/cp.webp" style="width:16px; height:16px; margin-right:5px;">Notepad</div>
+			<div id="menu_settings" style="position:absolute; top:50px; left:10px; cursor:pointer; color:white; font-weight:bold;">Settings</div>
+			<div id="menu_videos" style="position:absolute; top:80px; left:10px; cursor:pointer; color:white; font-weight:bold;">Videos</div>
+		</div>
 
 
 		<div id="page_login" class="page">
